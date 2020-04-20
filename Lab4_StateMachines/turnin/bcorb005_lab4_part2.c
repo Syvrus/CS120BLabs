@@ -11,10 +11,10 @@
 #ifdef _SIMULATE_
 #include "simAVRHeader.h"
 #endif
-enum States{ Start, INIT, INCREMENT, DECREMENT, BOTH, RELEASE_I, RELEASE_D,  RELEASE_B } state;	
+enum States{ Start, INIT, INCREMENT, DECREMENT, BOTH, RELEASE_I, RELEASE_D, RELEASE_B } state;	
+unsigned char temp, A1, A2;
 void Tick(){
-unsigned char temp = PORTC;
-switch(state){//Transi3ons	
+switch(state){//Transi3ons
 	case Start:
 		state = INIT;
 		break;
@@ -44,8 +44,13 @@ switch(state){//Transi3ons
 			}
 			state = DECREMENT;
 		}
-		if((PINA & 0x03) == 0x03)
+		if((PINA & 0x03) == 0x03){
+			if(temp > 0){
+				temp--;
+				PORTC = temp;
+			}
 			state = BOTH;
+		}
 		if((PINA & 0x00) == 0x00)
 			state = RELEASE_B;
 		break;
@@ -57,8 +62,13 @@ switch(state){//Transi3ons
 			}
 			state = INCREMENT;
 		}
-		if((PINA & 0x03) == 0x03)
+		if((PINA & 0x03) == 0x03){
+			if(temp < 9){
+				temp++;
+				PORTC = temp;
+			}
 			state = BOTH;
+		}
 		if((PINA & 0x03) == 0x00)
 			state = RELEASE_B;
 		break;
@@ -144,12 +154,13 @@ switch(state){//State ac3ons
 		
 }//State ac3ons	
 }	
-void main(){
+int main(void){
 	DDRA = 0x00;
 	PORTA = 0xFF;
 	DDRC = 0xFF;
 	PORTC = 0x07;//Ini3alize outputs	
 	state = Start;//Indicates ini3al call	
+	temp = PORTC;
 	while(1){
 		Tick();
 	}	

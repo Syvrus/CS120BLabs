@@ -65,6 +65,7 @@ checkResult
 test "PINA: 0x01, 0x02, 0x00 => PORTC: 0x08, 0x07, 0x00 state: INCREMENT, DECREMENT, RELEASE_B"
 set state = INIT
 expect state INIT
+expectPORTC 0x07
 setPINA 0x01
 continue 1
 expectPORTC 0x08
