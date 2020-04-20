@@ -11,8 +11,9 @@
 #ifdef _SIMULATE_
 #include "simAVRHeader.h"
 #endif
-enum States{ Start, INIT, INCREMENT, DECREMENT, BOTH, RELEASE_B } state;	
+enum States{ Start, INIT, INCREMENT, DECREMENT, BOTH, RELEASE_I, RELEASE_D,  RELEASE_B } state;	
 void Tick(){
+unsigned char temp = PORTC;
 switch(state){//Transi3ons	
 	case Start:
 		state = INIT;
@@ -23,7 +24,7 @@ switch(state){//Transi3ons
 		if(PINA & 0x03 == 0x02)
 			state = DECREMENT;
 		if(PINA & 0x03 == 0x03)
-			state = BOTH		
+			state = BOTH;
 		break;
 	case INCREMENT:
 		if(temp < 9)
@@ -35,16 +36,20 @@ switch(state){//Transi3ons
 		if(PINA & 0x00 == 0x00)
 			state = RELEASE_B;
 		break;
-	case ON_RELEASE:
-		if(PINA & 0x01)
-			state = OFF_PRESS;
-		else
-			state = ON_RELEASE;
+	case DECREMENT:
+		if(temp > 0)
+			temp--;
+		if(PINA & 0x03 == 0x01)
+			state = INCREMENT;
+		if(PINA & 0x03 == 0x03)
+			state = BOTH;
+		if(PINA & 0x03 == 0x00)
+			state = RELEASE_B;
 		break;
-	case OFF_PRESS:
-		if(PINA & 0x01)
-			state = OFF_PRESS;
-		else
+	case BOTH:
+		if(PINA & 0x03 == 0x02)
+			state = RELEASE_I;
+		if(PINA &
 			state = OFF_RELEASE;
 		break;
 	default:
