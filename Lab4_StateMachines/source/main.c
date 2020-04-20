@@ -19,28 +19,36 @@ switch(state){//Transi3ons
 		state = INIT;
 		break;
  	case INIT:
-		if(PINA & 0x03 == 0x01)
-			state = INCREMENT;;
-		if(PINA & 0x03 == 0x02)
+		if(PINA & 0x03 == 0x01){
+			if(temp < 9)
+				temp++;
+			state = INCREMENT;
+		}
+		if(PINA & 0x03 == 0x02){
+			if(temp > 0)
+				temp--;
 			state = DECREMENT;
+		}
 		if(PINA & 0x03 == 0x03)
 			state = BOTH;
 		break;
 	case INCREMENT:
-		if(temp < 9)
-			temp++;
-		if(PINA & 0x03 == 0x02)
+		if(PINA & 0x03 == 0x02){
+			if(temp > 0)
+				temp--;
 			state = DECREMENT;
+		}
 		if(PINA & 0x03 == 0x03)
 			state = BOTH;
 		if(PINA & 0x00 == 0x00)
 			state = RELEASE_B;
 		break;
 	case DECREMENT:
-		if(temp > 0)
-			temp--;
-		if(PINA & 0x03 == 0x01)
+		if(PINA & 0x03 == 0x01){
+			if(temp < 9)
+				temp++;
 			state = INCREMENT;
+		}
 		if(PINA & 0x03 == 0x03)
 			state = BOTH;
 		if(PINA & 0x03 == 0x00)
@@ -49,25 +57,60 @@ switch(state){//Transi3ons
 	case BOTH:
 		if(PINA & 0x03 == 0x02)
 			state = RELEASE_I;
-		if(PINA &
-			state = OFF_RELEASE;
+		if(PINA & 0x03 == 0x01)
+			state = RELEASE_D;
+		if(PINA & 0x03 == 0x00)
+			state = RELEASE_B;
+		break;
+	case RELEASE_I:
+		if(PINA & 0x03 == 0x00)
+			state = RELEASE_B;
+		if(PINA & 0x03 == 0x01){
+			if(temp < 9)
+				temp++;
+			state = INCREMENT;
+		}
+		if(PINA & 0x03 == 0x03){
+			if(temp < 9)
+				temp++;
+			state = BOTH;
+		}
+		break;
+	case RELEASE_D:
+		if(PINA & 0x03 == 0x00)
+			state = RELEASE_B;
+		if(PINA & 0x03 == 0x02){
+			if(temp > 0)
+				temp--;
+			state = DECREMENT;
+		}
+		if(PINA & 0x03 == 0x03){
+			if(temp > 0)
+				temp--;
+			state = BOTH;
+		}
+		break;
+	case RELEASE_B:
+		temp = 0;
+		if(PINA & 0x03 == 0x01){
+			if(temp < 9)
+				temp++;
+			state = INCREMENT;
+		}
+		if(PINA & 0x03 == 0x02){
+			if(temp > 0)
+				temp--;
+			state = DECREMENT;
+		}
+		if(PINA & 0x03 == 0x03)
+			state = BOTH;
 		break;
 	default:
 		state = Start;
 		break;
 }//Transi3ons	
 switch(state){//State ac3ons	
-	case ON_PRESS:
-		PORTB = 0x02;
-		break;
-	case OFF_PRESS:
-		PORTB = 0x01;
-		break;
-	case OFF_RELEASE:
-	case ON_RELEASE:
-		break;
 	default:
-		PORTB = 0x01;
 		break;
 		
 }//State ac3ons	
@@ -75,8 +118,8 @@ switch(state){//State ac3ons
 void main(){
 	DDRA = 0x00;
 	PORTA = 0xFF;
-	DDRB = 0xFF;	
- 	PORTB = 0x01;//Ini3alize outputs	
+	DDRC = 0xFF;
+	PORTC = 0x07;//Ini3alize outputs	
 	state = Start;//Indicates ini3al call	
 	while(1){
 		Tick();
