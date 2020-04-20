@@ -52,6 +52,9 @@ switch(state){//State ac3ons
 	case OFF_PRESS:
 		PORTB = 0x01;
 		break;
+	case OFF_RELEASE:
+	case ON_RELEASE:
+		break;
 	default:
 		PORTB = 0x01;
 		break;

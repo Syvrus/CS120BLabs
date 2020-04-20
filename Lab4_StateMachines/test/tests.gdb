@@ -64,7 +64,7 @@ expectPORTB 0x02
 setPINA 0x00
 continue 2
 expect state ON_RELEASE
-expectPORTB 0x01
+expectPORTB 0x02
 setPINA 0x01
 continue 2
 expect state OFF_PRESS
