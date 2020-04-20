@@ -47,38 +47,14 @@ set state = BOTH
 expect state BOTH
 checkResult
 
-test "Test from RELEASE_I"
-set state = RELEASE_I
-expect state RELEASE_I
+test "Test from RESET"
+set state = RESET
+expect state RESET
 checkResult
 
-test "Test from RELEASE_D"
-set state = RELEASE_D
-expect state RELEASE_D
-checkResult
-
-test "Test from RELEASE_B"
-set state = RELEASE_B
-expect state RELEASE_B
-checkResult
-
-test "PINA: 0x01, 0x02, 0x00 => PORTC: 0x08, 0x07, 0x00 state: INCREMENT, DECREMENT, RELEASE_B"
-set state = INIT
-expect state INIT
-expectPORTC 0x07
-setPINA 0x01
-continue 1
-expectPORTC 0x08
-expect state INCREMENT
-setPINA 0x02
-continue 1
-expectPORTC 0x07
-continue 2
-expect state DECREMENT
-setPINA 0x00
-continue 1
-expectPORTC 0x00
-expect state RELEASE_B
+test "Test from WAIT"
+set state = WAIT
+expect state WAIT
 checkResult
 
 # Report on how many tests passed/tests ran

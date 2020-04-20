@@ -11,143 +11,81 @@
 #ifdef _SIMULATE_
 #include "simAVRHeader.h"
 #endif
-enum States{ Start, INIT, INCREMENT, DECREMENT, BOTH, RELEASE_I, RELEASE_D, RELEASE_B } state;	
+enum States{ Start, INIT, INCREMENT, DECREMENT, BOTH, RESET, WAIT } state;	
 unsigned char temp, A1, A2;
 void Tick(){
 switch(state){//Transi3ons
+	A1 = PINA & 0x01;
+	A2 = PINA & 0x02;
 	case Start:
 		state = INIT;
 		break;
  	case INIT:
-		if((PINA & 0x03) == 0x01){
-			if(temp < 9){
-				temp++;
-				PORTC = temp;
-			}
+		if(!A1 && !A2)
+			state = INIT;
+		if(A1 && !A2)
 			state = INCREMENT;
-		}
-		if((PINA & 0x03) == 0x02){
-			if(temp > 0){
-				temp--;
-				PORTC = temp;
-			}
+		if(!A1 && A2)
 			state = DECREMENT;
-		}
-		if((PINA & 0x03) == 0x03)
+		else
 			state = BOTH;
 		break;
 	case INCREMENT:
-		if((PINA & 0x03) == 0x02){
-			if(temp > 0){
-				temp--;
-				PORTC = temp;
-			}
-			state = DECREMENT;
-		}
-		if((PINA & 0x03) == 0x03){
-			if(temp > 0){
-				temp--;
-				PORTC = temp;
-			}
+		if(A1 && A2)
 			state = BOTH;
-		}
-		if((PINA & 0x00) == 0x00)
-			state = RELEASE_B;
+		else
+			state = WAIT;
 		break;
 	case DECREMENT:
-		if((PINA & 0x03) == 0x01){
-			if(temp < 9){
-				temp++;
-				PORTC = temp;
-			}
-			state = INCREMENT;
-		}
-		if((PINA & 0x03) == 0x03){
-			if(temp < 9){
-				temp++;
-				PORTC = temp;
-			}
+		if(A1 && A2)
 			state = BOTH;
-		}
-		if((PINA & 0x03) == 0x00)
-			state = RELEASE_B;
+		else
+			state = WAIT;
 		break;
 	case BOTH:
-		if((PINA & 0x03) == 0x02)
-			state = RELEASE_I;
-		if((PINA & 0x03) == 0x01)
-			state = RELEASE_D;
-		if((PINA & 0x03) == 0x00)
-			state = RELEASE_B;
-		break;
-	case RELEASE_I:
-		if((PINA & 0x03) == 0x00)
-			state = RELEASE_B;
-		if((PINA & 0x03) == 0x01){
-			if(temp < 9){
-				temp++;
-				PORTC = temp;
-			}
+		if(A1 && A2)
+			state = RESET;
+		if(A1 && !A2)
 			state = INCREMENT;
-		}
-		if((PINA & 0x03) == 0x03){
-			if(temp < 9){
-				temp++;
-				PORTC = temp;
-			}
-			state = BOTH;
-		}
-		break;
-	case RELEASE_D:
-		if((PINA & 0x03) == 0x00)
-			state = RELEASE_B;
-		if((PINA & 0x03) == 0x02){
-			if(temp > 0){
-				temp--;
-				PORTC = temp;
-			}
+		if(!A1 && A2)
 			state = DECREMENT;
-		}
-		if((PINA & 0x03) == 0x03){
-			if(temp > 0){
-				temp--;
-				PORTC = temp;
-			}
+		if(A1 && A2)
 			state = BOTH;
-		}
 		break;
-	case RELEASE_B:
-		temp = 0;
-		PORTC = temp;
-		if((PINA & 0x03) == 0x01){
-			if(temp < 9){
-				temp++;
-				PORTC = temp;
-			}
+	case WAIT:
+		if(!A1 && !A2)
+			state = BOTH;
+		if(A1 && A2)
+			state = RESET;
+		else
+			state = WAIT;
+		break;
+	case RESET:
+		if(!A1 && !A2)
+			state = INIT;
+		if(A1 && !A2)
 			state = INCREMENT;
-		}
-		if((PINA & 0x03) == 0x02){
-			if(temp > 0){
-				temp--;
-				PORTC = temp;
-			}
+		if(!A1 && A2)
 			state = DECREMENT;
-		}
-		if((PINA & 0x03) == 0x03)
-			state = BOTH;
-		break;
+		if(A1 && A2)
+			state = RESET;
 	default:
 		state = Start;
 		break;
 }//Transi3ons	
 switch(state){//State ac3ons	
 	case INIT:
+		break;
 	case INCREMENT:
+		if(temp < 9)
+			temp++;
+		break;
 	case DECREMENT:
-	case BOTH:
-	case RELEASE_I:
-	case RELEASE_D:
-	case RELEASE_B:
+		if(temp > 0)
+			temp--;
+		break;
+	case RESET:
+		temp = 0x00;
 		break;
 	default:
 		break;
@@ -163,5 +101,6 @@ int main(void){
 	temp = PORTC;
 	while(1){
 		Tick();
+		PORTC = temp;
 	}	
 }	
