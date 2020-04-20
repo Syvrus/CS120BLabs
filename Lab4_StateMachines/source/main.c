@@ -78,11 +78,11 @@ switch(state){//State ac3ons
 		break;
 	case INCREMENT:
 		if(temp < 9)
-			temp++;
+			temp += 0x01;
 		break;
 	case DECREMENT:
 		if(temp > 0)
-			temp--;
+			temp -= 0x01;
 		break;
 	case RESET:
 		temp = 0x00;
