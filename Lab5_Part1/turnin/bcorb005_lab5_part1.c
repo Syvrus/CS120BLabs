@@ -11,7 +11,7 @@
 #ifdef _SIMULATE_
 #include "simAVRHeader.h"
 #endif
-
+//Demo Video Link: https://www.youtube.com/watch?v=Nn1w--wIxxo
 int main(void) {
     /* Insert DDR and PORT initializations */
 	DDRA = 0x00;

@@ -11,6 +11,7 @@
 #ifdef _SIMULATE_
 #include "simAVRHeader.h"
 #endif
+//Demo Video Link: https://www.youtube.com/watch?v=4q5Ak5OsOfY
 unsigned char tmpC, A0, tmpA;
 enum State{ Start, BLANK, s0P, s0R, s1P, s1R, s2P, s2R, s3P, s3R } state;
 void Tick(){
