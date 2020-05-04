@@ -7,86 +7,43 @@
  *	I acknowledge all content contained herein, excluding template or example
  *	code, is my own original work.
  */
+//https://www.youtube.com/watch?v=pu5fUS6huBg
 #include <avr/io.h>
 #ifdef _SIMULATE_
 #include "simAVRHeader.h"
 #endif
-//Demo Video Link: https://www.youtube.com/watch?v=4q5Ak5OsOfY
-unsigned char tmpC, A0, tmpA;
-enum State{ Start, BLANK, s0P, s0R, s1P, s1R, s2P, s2R, s3P, s3R } state;
+unsigned char tmpC, A0, tmpA, i = 0;
+unsigned char s[5] = {0x00, 0xAB, 0x2D, 0x35, 0x55};
+enum State{ Start, Press, Release } state;
 void Tick(){
 	A0 = tmpA & 0x01;
 	switch(state){
 		case Start:
-			state = BLANK;
+			state = Release;
 			break;
-		case BLANK:
-			if(A0 == 0x01)
-				state = s0P;
+		case Press:
+			if(A0)
+				state = Press;
+			else{
+				if(i < 5)
+					i++;
+				else
+					i = 0;
+				state = Release;
+			}
+			break;
+		case Release:
+			if(A0)
+				state = Press;
 			else
-				state = BLANK;
-			break;
-		case s0P:
-			state = s0R;
-			break;
-		case s0R:
-			if(A0 == 0x01)
-				state = s1P;
-			else
-				state = s0R;
-			break;
-		case s1P:
-			state = s1R;
-			break;
-		case s1R:
-			if(A0 == 0x01)
-				state = s2P;
-			else
-				state = s1R;
-			break;
-		case s2P:
-			state = s2R;
-			break;
-		case s2R:
-			if(A0 == 0x01)
-				state = s3P;
-			else
-				state = s2R;
-			break;
-		case s3P:
-			state = s3R;
-			break;
-		case s3R:
-			if(A0 == 0x01)
-				state = BLANK;
-			else
-				state = s3R;
+				state = Release;
 			break;
 		default:
 			break;
 	}
 	switch(state){
-		case Start:
-			PORTC = 0x00;
-			break;
-		case BLANK:
-			PORTC = 0x00;
-			break;
-		case s0P:
-		case s0R:
-			PORTC = 0xAB;
-			break;
-		case s1P:
-		case s1R:
-			PORTC = 0x2D;
-			break;
-		case s2P:
-		case s2R:
-			PORTC = 0x35;
-			break;
-		case s3P:
-		case s3R:
-			PORTC = 0x55;
+		case Release:
+			PORTC = s[i];
 			break;
 		default:
 			break;
