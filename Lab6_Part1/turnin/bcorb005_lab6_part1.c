@@ -13,7 +13,38 @@
 #include "simAVRHeader.h"
 #endif
 unsigned char s[3] = {0x01, 0x02, 0x04};
-unsigned i = 0;
+unsigned char i = 0, tmpC;
+
+enum State{Start, On}state;
+
+void Tick(){
+	switch(state){
+		case Start:
+			state = On;
+			break;
+		case On:
+			state = On;
+			break;
+		default:
+			break;
+	}
+	switch(state){
+		case Start:
+			break;
+		case On:
+			if(i < 2){
+				tmpC = s[i];
+				i++;
+			}
+			else{
+				tmpC = s[i];
+				i = 0;
+			}
+			break;
+		default:
+			break;
+	}
+}
 
 int main(void) {
     /* Insert DDR and PORT initializations */
@@ -21,16 +52,13 @@ int main(void) {
 	PORTC = 0x00;
 	TimerSet(1000);
 	TimerOn();
-	unsigned char tmpC = 0x00;
+	tmpC = 0x00;
     /* Insert your solution below */
     while (1) {
-        tmpC = s[i];
-        PORTC = tmpC;
         while(!TimerFlag);
 	TimerFlag = 0;
-	if(i < 2)
-		i++;
-	else i = 0;
+	Tick();
+	PORTC = tmpC;
     }
     return 1;
 }
