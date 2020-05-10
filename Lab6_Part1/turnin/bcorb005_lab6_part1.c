@@ -7,6 +7,7 @@
  *	I acknowledge all content contained herein, excluding template or example
  *	code, is my own original work.
  */
+//Link: https://www.youtube.com/watch?v=noTIGisPkLQ
 #include <avr/io.h>
 #include <../header/timer.h>
 #ifdef _SIMULATE_
